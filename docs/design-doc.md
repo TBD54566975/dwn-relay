@@ -79,7 +79,7 @@ sequenceDiagram
 On ingress (step 1 in the sequence diagram), the DWN Relay Service will:
   - leverage the DWN SDK to process and store the message
     - ⚠  **TODO**: Decide on whether storage can be toggled off. Instinctively I think it makes sense to be able to toggle it off but that does have considerable implications. The most notable implication is that `protocol` cannot be adhered to without storage
-  - base64url decode / decrypt `data` within the message
+  - base64url decode / decrypt `encodedData` within the message
     - ⚠  **TODO**: include details regarding which keys are being used to decode/decrypt the message
     - ⚠  **TODO**: include details regarding what happens if decoding/decrypting fails
   - send an HTTP request to the appropriate handler. Details about the request body are described [here](#dwn-relay---downstream-service-request-payload)
