@@ -54,17 +54,20 @@ sequenceDiagram
 {
   "handlers": [
     {
-      "filter": { 
-        "method": "CollectionsWrite", 
+      "filter": {
+        "method": "CollectionsWrite",
         "schema": "https://ssi-schemas.org/CredentialApplication",
         "protocol": ""
       },
       "endpoint": {
         "method": "POST",
         "url": "https://somehost/some-endpoint",
-        "requestOptions": {}
+        "requestOptions": {},
         "responseMapping": {
-          201: { "method": "CollectionsWrite", "schema": "https://ssi-schemas.org/CredentialApplication" }
+          "201": {
+            "method": "CollectionsWrite",
+            "schema": "https://ssi-schemas.org/CredentialApplication"
+          }
         }
       }
     }
