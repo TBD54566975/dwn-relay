@@ -199,8 +199,8 @@ The response sent from the Downstream Service back to the DWN Relay is evaluated
 {
   "handlers": [
     {
-      "filter": { 
-        "method": "CollectionsWrite", 
+      "filter": {
+        "method": "CollectionsWrite",
         "schema": "https://ssi-schemas.org/CredentialApplication",
         "protocol": ""
       },
@@ -208,7 +208,10 @@ The response sent from the Downstream Service back to the DWN Relay is evaluated
         "method": "POST",
         "url": "https://somehost/some-endpoint",
         "responseMapping": {
-          201: { "method": "CollectionsWrite", "schema": "https://ssi-schemas.org/CredentialApplication" }
+          "201": {
+            "method": "CollectionsWrite",
+            "schema": "https://ssi-schemas.org/CredentialApplication"
+          }
         }
       }
     }
