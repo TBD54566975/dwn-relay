@@ -182,7 +182,7 @@ decoded `encodedData` property from the above DWeb Message example
 
 The default behavior can be overridden in the config file by setting `handlers[x].endpoint.requestOptions.body` to a function. e.g:
 
-```javascript=
+```javascript
 async function transformRequestBody(dwm, data) {
   // construct and return the request body you want sent to the downstream service
 }
