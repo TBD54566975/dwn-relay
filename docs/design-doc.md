@@ -1,4 +1,4 @@
-# [Proposal] DWN Relay Service Design Doc  <!-- omit in toc -->
+# [Draft] DWN Relay Service Design Doc  <!-- omit in toc -->
 
 # Contents <!-- omit in toc -->
 
