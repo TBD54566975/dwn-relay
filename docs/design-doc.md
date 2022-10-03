@@ -5,7 +5,7 @@
 - [Abstract](#abstract)
 - [Handler Registration](#handler-registration)
   - [Config file](#config-file)
-- [DWN Relay Message Handling](#dwn-relay-message-handling)
+- [`Client -> DWN Relay`](#client---dwn-relay)
   - [Example Message](#example-message)
 - [`DWN Relay -> Downstream Service` Request Payload](#dwn-relay---downstream-service-request-payload)
   - [Example](#example)
@@ -75,7 +75,7 @@ sequenceDiagram
 }
 ```
 
-# DWN Relay Message Handling
+# `Client -> DWN Relay`
 On ingress (step 1 in the sequence diagram), the DWN Relay Service will:
   - leverage the DWN SDK to process and store the message
     - ⚠  **TODO**: Decide on whether storage can be toggled off. Instinctively I think it makes sense to be able to toggle it off but that does have considerable implications. The most notable implication is that `protocol` cannot be adhered to without storage
