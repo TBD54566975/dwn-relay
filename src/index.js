@@ -1,22 +1,23 @@
 import cluster from 'node:cluster';
-import os from 'node:os';
-import process from 'node:process';
 
+import config from './config';
 
-import { app } from './app.js';
-import { Server } from './server.js';
+import { app } from './app';
+import { Server } from './server';
 
-const numCPUs = os.cpus().length;
+const { numProcesses } = config.relay;
 
 if (cluster.isPrimary) {
-  console.log(`[pid:${process.pid}] Primary - Forking ${numCPUs} processes`);
+  // create DID if not exists
+
+  console.log(`[pid:${process.pid}] Primary - Forking ${numProcesses} processes`);
 
   // event handler that is triggered whenever a worker processor exits
   cluster.on('exit', (worker, code, signal) => {
     console.log(`[pid:${process.pid}] Primary - pid:${worker.process.pid} died with code ${code}`);
   });
 
-  for (let i = 0; i < numCPUs; i += 1) {
+  for (let i = 0; i < numProcesses; i += 1) {
     cluster.fork();
   }
 } else {
