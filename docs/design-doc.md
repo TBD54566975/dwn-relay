@@ -42,7 +42,6 @@ sequenceDiagram
   S->>R: HTTP Response
   R->>R: DWM'ify Response
   R->>C: DWMified response
-  
 ```
 
 # Handler Registration 
