@@ -2,6 +2,10 @@ import cors from 'cors';
 import express from 'express';
 import dwn from './dwn';
 
+import didConfig from './did/did-loader';
+
+const { did, privateJWK } = didConfig;
+
 const app = express();
 
 app.use(cors());
