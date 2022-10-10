@@ -7,6 +7,10 @@ import didConfig from '../did/did-loader';
 import handlerIndex from '../handler-index';
 
 const { did, privateJWK } = didConfig;
+const http = axios.create({
+  // always resolve promise if a response was returned regardless of status
+  validateStatus: null
+});
 
 export default async function dwnHandler(req, res) {
   const resp = await dwn.processRequest(req.body);
@@ -65,7 +69,34 @@ export default async function dwnHandler(req, res) {
       method : endpoint.method,
       data   : messageDataStr
     });
-  } catch(e) {
+
+    if (downstreamResp.status >= 400) {
+      // TODO: delete dwn message using `CollectionsDelete`
+      
+      let responseData;
+
+      // TODO: Yikes. Revisit. `detail` is too loosey goosey rn
+      if (downstreamResp.data) {
+        responseData = JSON.stringify(downstreamResp.data);
+      } else {
+        responseData = 'Internal server error';
+      }
+
+      
+      resp.replies[0] = {
+        status: { code: downstreamResp.status, detail: responseData }
+      };
+
+      return resp.status;
+    }
+
+    
+  } catch(error) {
+    if (error.request) {
+      // The request was made but no response was received. `error.request` is an instance of http.ClientRequest
+    } else {
+      // Something happened in setting up the request that triggered an Error
+    }
     // TODO: handle error
   }
 
