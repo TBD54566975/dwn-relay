@@ -30,6 +30,8 @@ export default {
     // number of processes to spawn. Each process is capable of handling requests 
     numProcesses : os.cpus().length,
     // absolute path to root of this project
-    rootPath     : projectRoot
+    rootPath     : projectRoot,
+    // handlers to register
+    handlers     : []
   }
 };
