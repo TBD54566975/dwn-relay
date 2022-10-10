@@ -64,7 +64,7 @@ export default async function dwnHandler(req, res) {
   const messageDataStr = new TextEncoder().encode(messageDataBytes);
 
   try {
-    const downstreamResp = await axios({
+    const downstreamResp = await http({
       url    : endpoint.url,
       method : endpoint.method,
       data   : messageDataStr
