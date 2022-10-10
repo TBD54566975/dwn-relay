@@ -89,17 +89,21 @@ export default async function dwnHandler(req, res) {
 
       return res.status(status).json(resp);
     }
-
-    // TODO: implement support for when a `responseMapping` is present
     const responseMapping = endpoint.responseMapping[downstreamResp.status];
 
-    if (!responseMapping) {
-      resp.replies[0] = {
-        status: { code: downstreamResp.status }
-      };
+    resp.replies[0] = {
+      status: { code: downstreamResp.status }
+    };
 
+    if (!responseMapping) {
       return res.status(status).json(resp);
     }
+
+    // TODO: implement support for when a `responseMapping` is present
+    // - build DWebMessage using `downstreamResp.data` + `responseMapping`
+    // - store DWebMessage 
+    // - add DWebMessage to `reply.entries`
+    // - return response
 
   } catch(error) {
     if (error.request) {
