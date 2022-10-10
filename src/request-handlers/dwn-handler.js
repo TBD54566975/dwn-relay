@@ -87,10 +87,20 @@ export default async function dwnHandler(req, res) {
         status: { code: downstreamResp.status, detail: responseData }
       };
 
-      return resp.status;
+      return res.status(status).json(resp);
     }
 
-    
+    // TODO: implement support for when a `responseMapping` is present
+    const responseMapping = endpoint.responseMapping[downstreamResp.status];
+
+    if (!responseMapping) {
+      resp.replies[0] = {
+        status: { code: downstreamResp.status }
+      };
+
+      return res.status(status).json(resp);
+    }
+
   } catch(error) {
     if (error.request) {
       // The request was made but no response was received. `error.request` is an instance of http.ClientRequest
