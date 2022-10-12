@@ -56,19 +56,21 @@ export default async function dwnHandler(req, res) {
   //! NOTE: Naively assuming 1 matched handler for now
 
   const [ matchedHandler ] = matchedHandlers;
-  const { endpoint } = matchedHandler;
+  const { endpoint } = matchedHandler.document;
 
   // TODO: add support for custom request builder
 
-  const messageDataBytes = base64url.baseDecode(dwnMessage.data);
-  const messageDataStr = new TextEncoder().encode(messageDataBytes);
+  let requestOpts = { url: endpoint.url, method: endpoint.method };
+
+  if (dwnMessage.encodedData) {
+    const messageDataBytes = base64url.baseDecode(dwnMessage.encodedData);
+    const messageDataStr = new TextEncoder().decode(messageDataBytes);
+
+    requestOpts.data = messageDataStr;
+  }
 
   try {
-    const downstreamResp = await http({
-      url    : endpoint.url,
-      method : endpoint.method,
-      data   : messageDataStr
-    });
+    const downstreamResp = await http(requestOpts);
 
     if (downstreamResp.status >= 400) {
       // TODO: delete dwn message using `CollectionsDelete`
@@ -89,16 +91,18 @@ export default async function dwnHandler(req, res) {
 
       return res.status(status).json(resp);
     }
-    const responseMapping = endpoint.responseMapping[downstreamResp.status];
+
+    const { responseMapping = {}} = endpoint;
+    const statusMapping = responseMapping[downstreamResp.status];
 
     resp.replies[0] = {
       status: { code: downstreamResp.status }
     };
 
-    if (!responseMapping) {
+    if (!statusMapping) {
       return res.status(status).json(resp);
     }
-
+    
     // TODO: implement support for when a `responseMapping` is present
     // - build DWebMessage using `downstreamResp.data` + `responseMapping`
     // - store DWebMessage 
@@ -106,6 +110,7 @@ export default async function dwnHandler(req, res) {
     // - return response
 
   } catch(error) {
+    console.error(error);
     if (error.request) {
       // The request was made but no response was received. `error.request` is an instance of http.ClientRequest
     } else {
@@ -114,5 +119,5 @@ export default async function dwnHandler(req, res) {
     // TODO: handle error
   }
 
-  return resp.sendStatus(501);
+  return res.sendStatus(501);
 }
