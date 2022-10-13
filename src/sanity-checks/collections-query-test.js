@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { CollectionsQuery } from '@tbd54566975/dwn-sdk-js';
