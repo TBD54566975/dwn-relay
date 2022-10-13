@@ -1,7 +1,9 @@
-FROM node:18-alpine3.15
+FROM node:18-alpine
 
 WORKDIR /usr/app
 COPY package*.json .
+COPY src ./src
 
 RUN npm install
-COPY . .
+
+CMD ["sleep", "infinity"]
