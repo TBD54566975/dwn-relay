@@ -2,8 +2,8 @@ import axios from 'axios';
 import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 import { v4 as uuidv4 } from 'uuid';
 import { DIDKey } from '../did/did-key';
+import didConfig from '../did/did-loader';
 
-const SSI_DID = 'did:key:z6MkubAenkGWbSjGqwGdju6vmR9iTMCCyy4c9kgyVUMKRrhg';
 const { did: aliceDID, privateJWK } = await DIDKey.generate();
 
 const signatureInput = {
@@ -48,11 +48,11 @@ const credAppDwnMessage = await CollectionsWrite.create({
   dateCreated : Date.now(),
   dataFormat  : 'application/json',
   nonce       : uuidv4(),
-  recipient   : SSI_DID,
+  recipient   : didConfig.did,
   recordId    : uuidv4(),
-  target      : aliceDID,
-  protocol    : 'CredentialIssuance',
-  schema      : 'https://base64url-is-the-answer-to-everything.com/CredentialApplication',
+  target      : didConfig.did,
+  protocol    : 'https://identity.foundation/decentralized-web-node/protocols/credential-issuance',
+  schema      : 'https://identity.foundation/credential-manifest/schemas/credential-application',
   signatureInput
 });
 

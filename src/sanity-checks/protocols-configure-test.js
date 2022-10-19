@@ -1,17 +1,14 @@
 import axios from 'axios';
 import { ProtocolsConfigure } from '@tbd54566975/dwn-sdk-js';
-import { DIDKey } from '../did/did-key';
-
-const SSI_DID = 'did:key:z6MkpBmJNwPU7vubZWa9YBZU3EjW5SVnGhhjCJQFMYBW4V2E';
-const { did: aliceDID, privateJWK } = await DIDKey.generate();
+import didConfig from '../did/did-loader';
 
 const signatureInput = {
-  protectedHeader : { alg: privateJWK.alg, kid: privateJWK.kid },
-  jwkPrivate      : privateJWK
+  protectedHeader : { alg: didConfig.privateJWK.alg, kid: didConfig.privateJWK.kid },
+  jwkPrivate      : didConfig.privateJWK
 };
 
 const protocolsConfigureMessage = await ProtocolsConfigure.create({
-  target     : SSI_DID,
+  target     : didConfig.did,
   protocol   : 'https://identity.foundation/decentralized-web-node/protocols/credential-issuance',
   definition : {
     'labels': {
