@@ -64,7 +64,7 @@ export default async function dwnHandler(req, res) {
 
   if (dwnMessage.encodedData) {
     const messageDataBytes = base64url.baseDecode(dwnMessage.encodedData);
-    const messageDataStr = new TextEncoder().decode(messageDataBytes);
+    const messageDataStr = new TextDecoder().decode(messageDataBytes);
 
     requestOpts.data = messageDataStr;
   }
