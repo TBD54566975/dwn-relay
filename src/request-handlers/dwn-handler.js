@@ -95,6 +95,8 @@ export default async function dwnHandler(req, res) {
     const { responseMapping = {}} = endpoint;
     const statusMapping = responseMapping[downstreamResp.status];
 
+    console.log(JSON.stringify(downstreamResp.data, null, 2));
+
     resp.replies[0] = {
       status: { code: downstreamResp.status }
     };
