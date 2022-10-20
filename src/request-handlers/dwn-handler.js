@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 import { base64url } from 'multiformats/bases/base64';
+import { v4 as uuidv4 } from 'uuid';
 
+import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 import dwn from '../dwn';
 import didConfig from '../did/did-loader';
 import handlerIndex from '../handler-index';
@@ -104,12 +106,55 @@ export default async function dwnHandler(req, res) {
     if (!statusMapping) {
       return res.status(status).json(resp);
     }
+
+    const collectionsWriteInput = { ...statusMapping, target: didConfig.did, recordId: uuidv4() };
+
+
+    if ('content-type' in downstreamResp.headers) {
+      collectionsWriteInput.dataFormat = downstreamResp.headers['content-type'];
+    }
     
-    // TODO: implement support for when a `responseMapping` is present
-    // - build DWebMessage using `downstreamResp.data` + `responseMapping`
-    // - store DWebMessage 
-    // - add DWebMessage to `reply.entries`
-    // - return response
+    const { 
+      descriptor: originatingMessageDescriptor, 
+      authorization: originatingMessageAuthorization 
+    } = dwnMessage;
+
+    const [ signature ] = originatingMessageAuthorization.signatures;
+    const decodedJwsHeader = base64url.baseDecode(signature.protected);
+    
+    collectionsWriteInput.recipient = decodedJwsHeader.kid.split('#');
+
+    const { privateJWK } = didConfig;
+    collectionsWriteInput.signatureInput = {
+      protectedHeader : { alg: privateJWK.alg, kid: privateJWK.kid },
+      jwkPrivate      : privateJWK
+    };
+
+    if (originatingMessageDescriptor.protocol) {
+      collectionsWriteInput.protocl = originatingMessageDescriptor.protocol;
+      collectionsWriteInput.contextId = originatingMessageDescriptor.contextId;
+      collectionsWriteInput.parentId = originatingMessageDescriptor.recordId;
+    }
+
+    if (resp.data) {
+      const dataStr = JSON.stringify(resp.data);
+      collectionsWriteInput.data = new TextEncoder().encode(dataStr);
+    }
+    
+    const dwmifiedResponse = await CollectionsWrite.create(collectionsWriteInput);
+    
+    // TODO: handle errors
+    await dwn.processMessage(dwmifiedResponse);
+
+    const theOtherThang = { ...collectionsWriteInput };
+    theOtherThang.target = collectionsWriteInput.recipient;
+
+    resp.replies[0] = {
+      status  : { code: downstreamResp.status },
+      entries : [theOtherThang]
+    };
+
+    return res.status(200).json(resp);
 
   } catch(error) {
     console.error(error);
