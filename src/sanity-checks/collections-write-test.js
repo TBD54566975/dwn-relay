@@ -3,7 +3,6 @@ import { CollectionsWrite } from '@tbd54566975/dwn-sdk-js';
 import { v4 as uuidv4 } from 'uuid';
 import { DIDKey } from '../did/did-key';
 import didConfig from '../did/did-loader';
-
 const { did: aliceDID, privateJWK } = await DIDKey.generate();
 
 const signatureInput = {
@@ -12,36 +11,11 @@ const signatureInput = {
 };
 
 const credApp = {
-  'id'           : 'c0c6e312-ad44-4f18-935e-a6efaad91612',
-  'spec_version' : 'https://identity.foundation/credential-manifest/spec/v1.0.0/',
-  'manifest_id'  : '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
-  'format'       : {
-    'jwt_vc': {
-      'alg': [
-        'EdDSA'
-      ]
-    }
-  },
-  'presentation_submission': {
-    'id'             : '00239c16-3e64-4438-8dda-641e963fa853',
-    'definition_id'  : '32f54163-7166-48f1-93d8-ff217bdb0653',
-    'descriptor_map' : [
-      {
-        'id'     : 'kyc1',
-        'format' : 'vc-jwt',
-        'path'   : '$.verifiableCredential[0]'
-      }
-    ]
-  },
-  'verifiableCredential': [
-    'eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa3ViQWVua0dXYlNqR3F3R2RqdTZ2bVI5aVRNQ0N5eTRjOWtneVZVTUtScmhnIiwidHlwIjoiSldUIn0.eyJleHAiOjI1ODAxMzAwODAsImlzcyI6ImRpZDprZXk6ejZNa3ViQWVua0dXYlNqR3F3R2RqdTZ2bVI5aVRNQ0N5eTRjOWtneVZVTUtScmhnIiwianRpIjoiY2JiM2QwNjEtZDZkOS00ZTE4LThmMDYtZDkyZDQ2MjM5YTRmIiwibmJmIjoxNjY2MTk2NjY0LCJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJpZCI6ImNiYjNkMDYxLWQ2ZDktNGUxOC04ZjA2LWQ5MmQ0NjIzOWE0ZiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiXSwiaXNzdWVyIjoiZGlkOmtleTp6Nk1rdWJBZW5rR1diU2pHcXdHZGp1NnZtUjlpVE1DQ3l5NGM5a2d5VlVNS1JyaGciLCJpc3N1YW5jZURhdGUiOiIyMDIyLTEwLTE5VDE2OjI0OjI0WiIsImV4cGlyYXRpb25EYXRlIjoiMjA1MS0xMC0wNVQxNDo0ODowMC4wMDBaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiYWRkaXRpb25hbE5hbWUiOiJoYW5rIGhpbGwiLCJiaXJ0aERhdGUiOiIyMDA5LTAxLTAzIiwiZmFtaWx5TmFtZSI6InNpbXBzb24iLCJnaXZlbk5hbWUiOiJyaWNreSBib2JieSIsInBvc3RhbEFkZHJlc3MiOiJwIHNoZXJtYW4gNDIgd2FsbGFieSB3YXksIHN5ZG5leSIsInRheElEIjoiMTIzIn0sImNyZWRlbnRpYWxTY2hlbWEiOnsiaWQiOiJjMDYwZmRlYi0yOGQyLTQyNzItYjQwYS0yZDBiMzk2MjM0NGMiLCJ0eXBlIjoiSnNvblNjaGVtYVZhbGlkYXRvcjIwMTgifX19.vdgPFmV6cF0tESFSgIi-Rk_BoVA6nemf_Ko7bi2fpv3XgoOkSZzOZZA6DqeEJ1qpRPiOZxQuZJVF7rkiLd6aCQ'
-  ]
+  'applicationJwt': 'eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa3U4N2NVUlJWUzRkcW44cmV2QjdkTXZGTWRmTGt4enFRMjloZmNRejlkbjhXIiwidHlwIjoiSldUIn0.eyJhbGciOiJFZERTQSIsImNyZWRlbnRpYWxfYXBwbGljYXRpb24iOnsiZm9ybWF0Ijp7Imp3dCI6eyJhbGciOlsiRWREU0EiXX19LCJpZCI6ImlkMTIzIiwibWFuaWZlc3RfaWQiOiJiY2MzNTg5NC0wZDMwLTQxMTgtOWY4Yi1lYzI3NzhmOTg4NjAiLCJwcmVzZW50YXRpb25fc3VibWlzc2lvbiI6eyJkZWZpbml0aW9uX2lkIjoiMzJmNTQxNjMtNzE2Ni00OGYxLTkzZDgtZmYyMTdiZGIwNjUzIiwiZGVzY3JpcHRvcl9tYXAiOlt7ImZvcm1hdCI6Imp3dF92YyIsImlkIjoia3ljMSIsInBhdGgiOiIkLnZlcmlmaWFibGVDcmVkZW50aWFsc1swXSJ9XSwiaWQiOiJwc2lkIn0sInNwZWNfdmVyc2lvbiI6Imh0dHBzOi8vaWRlbnRpdHkuZm91bmRhdGlvbi9jcmVkZW50aWFsLW1hbmlmZXN0L3NwZWMvdjEuMC4wLyJ9LCJpYXQiOjE2NjYzODYyNTEsImlzcyI6ImRpZDprZXk6ejZNa3U4N2NVUlJWUzRkcW44cmV2QjdkTXZGTWRmTGt4enFRMjloZmNRejlkbjhXIiwia2lkIjoiZGlkOmtleTp6Nk1rdTg3Y1VSUlZTNGRxbjhyZXZCN2RNdkZNZGZMa3h6cVEyOWhmY1F6OWRuOFciLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbHMiOlsiZXlKaGJHY2lPaUpGWkVSVFFTSXNJbXRwWkNJNkltUnBaRHByWlhrNmVqWk5hM2RNVTJsME5IVlRPSFZUUjBSQ09URnRObU5pYjJKalpFeEVOR2x0Ym1VNGJrWnZhVkJwVlRSdWVtdHhJaXdpZEhsd0lqb2lTbGRVSW4wLmV5SmxlSEFpT2pJMU9EQXhNekF3T0RBc0ltbHpjeUk2SW1ScFpEcHJaWGs2ZWpaTmEzZE1VMmwwTkhWVE9IVlRSMFJDT1RGdE5tTmliMkpqWkV4RU5HbHRibVU0YmtadmFWQnBWVFJ1ZW10eElpd2lhblJwSWpvaVptSXhZVEJsWVdJdFkyWmhaaTAwTW1GaUxUa3hZakF0WWpJNVl6Y3lZemc0TW1ReUlpd2libUptSWpveE5qWTJNemcyTWpVd0xDSnpkV0lpT2lKa2FXUTZhMlY1T25vMlRXdDNURk5wZERSMVV6aDFVMGRFUWpreGJUWmpZbTlpWTJSTVJEUnBiVzVsT0c1R2IybFFhVlUwYm5wcmNTSXNJblpqSWpwN0lrQmpiMjUwWlhoMElqcGJJbWgwZEhCek9pOHZkM2QzTG5jekxtOXlaeTh5TURFNEwyTnlaV1JsYm5ScFlXeHpMM1l4SWwwc0ltbGtJam9pWm1JeFlUQmxZV0l0WTJaaFppMDBNbUZpTFRreFlqQXRZakk1WXpjeVl6ZzRNbVF5SWl3aWRIbHdaU0k2V3lKV1pYSnBabWxoWW14bFEzSmxaR1Z1ZEdsaGJDSmRMQ0pwYzNOMVpYSWlPaUprYVdRNmEyVjVPbm8yVFd0M1RGTnBkRFIxVXpoMVUwZEVRamt4YlRaalltOWlZMlJNUkRScGJXNWxPRzVHYjJsUWFWVTBibnByY1NJc0ltbHpjM1ZoYm1ObFJHRjBaU0k2SWpJd01qSXRNVEF0TWpGVU1qRTZNRFE2TVRCYUlpd2laWGh3YVhKaGRHbHZia1JoZEdVaU9pSXlNRFV4TFRFd0xUQTFWREUwT2pRNE9qQXdMakF3TUZvaUxDSmpjbVZrWlc1MGFXRnNVM1ZpYW1WamRDSTZleUpoWkdScGRHbHZibUZzVG1GdFpTSTZJbWhoYm1zZ2FHbHNiQ0lzSW1KcGNuUm9SR0YwWlNJNklqSXdNRGt0TURFdE1ETWlMQ0ptWVcxcGJIbE9ZVzFsSWpvaWMybHRjSE52YmlJc0ltZHBkbVZ1VG1GdFpTSTZJbkpwWTJ0NUlHSnZZbUo1SWl3aWFXUWlPaUprYVdRNmEyVjVPbm8yVFd0M1RGTnBkRFIxVXpoMVUwZEVRamt4YlRaalltOWlZMlJNUkRScGJXNWxPRzVHYjJsUWFWVTBibnByY1NJc0luQnZjM1JoYkVGa1pISmxjM01pT25zaVlXUmtjbVZ6YzBOdmRXNTBjbmtpT2lKVkxsTXVRU0lzSW1Ga1pISmxjM05NYjJOaGJHbDBlU0k2SWtGMWMzUnBiaUlzSW1Ga1pISmxjM05TWldkcGIyNGlPaUpVV0NJc0luQnZjM1JoYkVOdlpHVWlPaUkzT0RjeU5DSXNJbk4wY21WbGRFRmtaSEpsYzNNaU9pSXhNak1nU21GdWEzUnZjR2xoSUVGMlpTNGlmU3dpZEdGNFNVUWlPaUl4TWpNaWZTd2lZM0psWkdWdWRHbGhiRk5qYUdWdFlTSTZleUpwWkNJNklqbGpOekl6TURBd0xUY3dPRGt0TkRoallTMDROR1EwTFRJeVlXWmpaalF3T1dGaU1DSXNJblI1Y0dVaU9pSktjMjl1VTJOb1pXMWhWbUZzYVdSaGRHOXlNakF4T0NKOWZYMC5ScksyQjhEX2hKeF8taEJkYnZNSERFeXlqZ2NOZ2Mtb1kwODFsb21zS0Z6VmFzNm14YVdXMENVWHIzWGdnWEo4SjdQejJFT2plSlVIOUcyT3BFN2RBQSJdfQ.Au7ghMMN8FL2TR3tqoaHhP4pFF8MLS5sgdyG387XNaDWmduqq6xLjE4BJptfnboFAfg_-sb02N2sAmy5P_SeDg'
 };
-
 // TODO: chuck credapp into a JWT
 const credAppJson = JSON.stringify(credApp);
 const credAppBytes = new TextEncoder().encode(credAppJson);
-
 const credAppDwnMessage = await CollectionsWrite.create({
   contextId   : uuidv4(),
   data        : credAppBytes,
@@ -55,15 +29,14 @@ const credAppDwnMessage = await CollectionsWrite.create({
   schema      : 'https://identity.foundation/credential-manifest/schemas/credential-application',
   signatureInput
 });
-
 const dwnRequest = {
   messages: [credAppDwnMessage.toObject()]
 };
-
+console.log('Sending Request to DWN:');
+console.log(JSON.stringify(dwnRequest));
 try {
   const resp = await axios.post('http://localhost:9000', dwnRequest);
   console.log(resp.status, JSON.stringify(resp.data, null, 2));
-
 } catch (e) {
   console.log(e);
 }

@@ -58,7 +58,7 @@ export default async function dwnHandler(req, res) {
   //! NOTE: Naively assuming 1 matched handler for now
 
   const [ matchedHandler ] = matchedHandlers;
-  const { endpoint } = matchedHandler.document;
+  const { endpoint, responseMapping = {} } = matchedHandler.document;
 
   // TODO: add support for custom request builder
 
@@ -94,7 +94,6 @@ export default async function dwnHandler(req, res) {
       return res.status(status).json(resp);
     }
 
-    const { responseMapping = {}} = endpoint;
     const statusMapping = responseMapping[downstreamResp.status];
 
     console.log(JSON.stringify(downstreamResp.data, null, 2));
@@ -120,9 +119,12 @@ export default async function dwnHandler(req, res) {
     } = dwnMessage;
 
     const [ signature ] = originatingMessageAuthorization.signatures;
-    const decodedJwsHeader = base64url.baseDecode(signature.protected);
     
-    collectionsWriteInput.recipient = decodedJwsHeader.kid.split('#');
+    const jwsHeaderBytes = base64url.baseDecode(signature.protected);
+    const jwsHeaderString = new TextDecoder().decode(jwsHeaderBytes);
+    const jwsHeader = JSON.parse(jwsHeaderString);
+    
+    collectionsWriteInput.recipient = jwsHeader.kid.split('#')[0];
 
     const { privateJWK } = didConfig;
     collectionsWriteInput.signatureInput = {
@@ -131,27 +133,30 @@ export default async function dwnHandler(req, res) {
     };
 
     if (originatingMessageDescriptor.protocol) {
-      collectionsWriteInput.protocl = originatingMessageDescriptor.protocol;
+      collectionsWriteInput.protocol = originatingMessageDescriptor.protocol;
       collectionsWriteInput.contextId = originatingMessageDescriptor.contextId;
       collectionsWriteInput.parentId = originatingMessageDescriptor.recordId;
     }
 
-    if (resp.data) {
-      const dataStr = JSON.stringify(resp.data);
+    if (downstreamResp.data) {
+      const dataStr = JSON.stringify(downstreamResp.data);
       collectionsWriteInput.data = new TextEncoder().encode(dataStr);
     }
     
     const dwmifiedResponse = await CollectionsWrite.create(collectionsWriteInput);
+    console.log(JSON.stringify(dwmifiedResponse.toJSON(), null, 4));
     
     // TODO: handle errors
-    await dwn.processMessage(dwmifiedResponse);
+    await dwn.processMessage(dwmifiedResponse.toObject());
 
     const theOtherThang = { ...collectionsWriteInput };
     theOtherThang.target = collectionsWriteInput.recipient;
 
+    const chuckchuckbang = await CollectionsWrite.create(theOtherThang);
+
     resp.replies[0] = {
       status  : { code: downstreamResp.status },
-      entries : [theOtherThang]
+      entries : [chuckchuckbang.toObject()]
     };
 
     return res.status(200).json(resp);
