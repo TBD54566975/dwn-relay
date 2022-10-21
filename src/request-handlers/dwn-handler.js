@@ -96,8 +96,6 @@ export default async function dwnHandler(req, res) {
 
     const statusMapping = responseMapping[downstreamResp.status];
 
-    console.log(JSON.stringify(downstreamResp.data, null, 2));
-
     resp.replies[0] = {
       status: { code: downstreamResp.status }
     };
@@ -144,7 +142,6 @@ export default async function dwnHandler(req, res) {
     }
     
     const dwmifiedResponse = await CollectionsWrite.create(collectionsWriteInput);
-    console.log(JSON.stringify(dwmifiedResponse.toJSON(), null, 4));
     
     // TODO: handle errors
     await dwn.processMessage(dwmifiedResponse.toObject());
