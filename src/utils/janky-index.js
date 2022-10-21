@@ -41,8 +41,15 @@ export default class JankyIndex {
   }
 
   query(filter) {
+    console.log("QUERY")
     const flattenedFilter = flatten(filter);
     const fieldMatches = new Map();
+
+    console.log(flattenedFilter)
+
+    console.log("vs")
+
+    console.log(this.fieldIndexes)
 
     for (let field in flattenedFilter) {
       if (!this.fieldIndexes.has(field)) {
@@ -83,6 +90,8 @@ export default class JankyIndex {
       results.push(result);
     }
 
+    console.log("Results: ")
+    console.log(results)
     return results;
   }
 }

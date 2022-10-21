@@ -13,9 +13,14 @@ const http = axios.create({
 });
 
 export default async function dwnHandler(req, res) {
+
+  console.log("START DWN HANDLER")
   const resp = await dwn.processRequest(req.body);
+
+  console.log(resp)
   const status = resp.status?.code || 200;
 
+  console.log(status)
   if (status >= 400) {
     return res.status(status).json(resp);
   }
@@ -32,9 +37,11 @@ export default async function dwnHandler(req, res) {
     return res.status(status).json(resp);
   }
   
+  console.log(req.body)
   let dwnRequest = new TextDecoder().decode(req.body);
   dwnRequest = JSON.parse(dwnRequest);
 
+  console.log(dwnRequest)
   const { messages } = dwnRequest;
   const [ dwnMessage ] = messages;
   const { descriptor } = dwnMessage;
@@ -48,6 +55,8 @@ export default async function dwnHandler(req, res) {
 
   const matchedHandlers = handlerIndex.query(handlerFilter);
 
+  console.log(matchedHandlers.length)
+  
   if (matchedHandlers.length === 0) {
     return res.status(status).json(resp);
   }
