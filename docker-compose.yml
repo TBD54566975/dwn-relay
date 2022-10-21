@@ -1,0 +1,7 @@
+version: "3.98"
+services:
+  dwnweb:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
