@@ -1,22 +1,14 @@
 import cors from 'cors';
 import express from 'express';
-import dwn from './dwn';
 
-import didConfig from './did/did-loader';
-
-const { did, privateJWK } = didConfig;
+import publicHandler from './routes/public';
 
 const app = express();
 
 app.use(cors());
 app.use(express.raw({ type: '*/*' }));
 
-app.post('/', async (req, res) => {
-  const resp = await dwn.processRequest(req.body);
-  const status = resp.status?.code || 200;
-
-  return res.status(status).json(resp);
-});
+app.use('/', publicHandler);
 
 
 export default app;
