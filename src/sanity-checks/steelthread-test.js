@@ -34,8 +34,13 @@ const getManifests = async () => {
   try {
     resp = await axios.post("http://localhost:9000", dwnRequest);
 
-    console.log("\nDWN Message Response:");
+    console.log("\nCollections Query DWN Message Response:\n");
     console.log(resp.status, JSON.stringify(resp.data, null, 2));
+
+
+    console.log("\nCollections Query Decoded Data:\n");
+    console.log(atob(resp.data.replies[0].entries[0].encodedData))
+
   } catch (e) {
     console.log(e);
   }
@@ -43,8 +48,15 @@ const getManifests = async () => {
   return resp;
 };
 
-const submitApplication = async () => {
+const submitApplication = async (getManifestsResp) => {
   console.log("\nStart Submit Application Collections Write\n");
+
+  const getManifestsDecodedData = atob(getManifestsResp.data.replies[0].entries[0].encodedData)
+  const getManifestsDecodedDataJson = JSON.parse(getManifestsDecodedData)
+
+
+  console.log("\n HERE \n")
+  console.log(getManifestsDecodedDataJson.manifests[0].credential_manifest)
 
   const { did, privateJWK } = await DIDKey.generate();
 
@@ -53,11 +65,7 @@ const submitApplication = async () => {
     jwkPrivate: privateJWK,
   };
 
-  // This is an example of a cred app jwt that is valid for ssi-service
-  // const credApp = {
-  //   'applicationJwt': 'eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa3U4N2NVUlJWUzRkcW44cmV2QjdkTXZGTWRmTGt4enFRMjloZmNRejlkbjhXIiwidHlwIjoiSldUIn0.eyJhbGciOiJFZERTQSIsImNyZWRlbnRpYWxfYXBwbGljYXRpb24iOnsiZm9ybWF0Ijp7Imp3dCI6eyJhbGciOlsiRWREU0EiXX19LCJpZCI6ImlkMTIzIiwibWFuaWZlc3RfaWQiOiJiY2MzNTg5NC0wZDMwLTQxMTgtOWY4Yi1lYzI3NzhmOTg4NjAiLCJwcmVzZW50YXRpb25fc3VibWlzc2lvbiI6eyJkZWZpbml0aW9uX2lkIjoiMzJmNTQxNjMtNzE2Ni00OGYxLTkzZDgtZmYyMTdiZGIwNjUzIiwiZGVzY3JpcHRvcl9tYXAiOlt7ImZvcm1hdCI6Imp3dF92YyIsImlkIjoia3ljMSIsInBhdGgiOiIkLnZlcmlmaWFibGVDcmVkZW50aWFsc1swXSJ9XSwiaWQiOiJwc2lkIn0sInNwZWNfdmVyc2lvbiI6Imh0dHBzOi8vaWRlbnRpdHkuZm91bmRhdGlvbi9jcmVkZW50aWFsLW1hbmlmZXN0L3NwZWMvdjEuMC4wLyJ9LCJpYXQiOjE2NjYzODYyNTEsImlzcyI6ImRpZDprZXk6ejZNa3U4N2NVUlJWUzRkcW44cmV2QjdkTXZGTWRmTGt4enFRMjloZmNRejlkbjhXIiwia2lkIjoiZGlkOmtleTp6Nk1rdTg3Y1VSUlZTNGRxbjhyZXZCN2RNdkZNZGZMa3h6cVEyOWhmY1F6OWRuOFciLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbHMiOlsiZXlKaGJHY2lPaUpGWkVSVFFTSXNJbXRwWkNJNkltUnBaRHByWlhrNmVqWk5hM2RNVTJsME5IVlRPSFZUUjBSQ09URnRObU5pYjJKalpFeEVOR2x0Ym1VNGJrWnZhVkJwVlRSdWVtdHhJaXdpZEhsd0lqb2lTbGRVSW4wLmV5SmxlSEFpT2pJMU9EQXhNekF3T0RBc0ltbHpjeUk2SW1ScFpEcHJaWGs2ZWpaTmEzZE1VMmwwTkhWVE9IVlRSMFJDT1RGdE5tTmliMkpqWkV4RU5HbHRibVU0YmtadmFWQnBWVFJ1ZW10eElpd2lhblJwSWpvaVptSXhZVEJsWVdJdFkyWmhaaTAwTW1GaUxUa3hZakF0WWpJNVl6Y3lZemc0TW1ReUlpd2libUptSWpveE5qWTJNemcyTWpVd0xDSnpkV0lpT2lKa2FXUTZhMlY1T25vMlRXdDNURk5wZERSMVV6aDFVMGRFUWpreGJUWmpZbTlpWTJSTVJEUnBiVzVsT0c1R2IybFFhVlUwYm5wcmNTSXNJblpqSWpwN0lrQmpiMjUwWlhoMElqcGJJbWgwZEhCek9pOHZkM2QzTG5jekxtOXlaeTh5TURFNEwyTnlaV1JsYm5ScFlXeHpMM1l4SWwwc0ltbGtJam9pWm1JeFlUQmxZV0l0WTJaaFppMDBNbUZpTFRreFlqQXRZakk1WXpjeVl6ZzRNbVF5SWl3aWRIbHdaU0k2V3lKV1pYSnBabWxoWW14bFEzSmxaR1Z1ZEdsaGJDSmRMQ0pwYzNOMVpYSWlPaUprYVdRNmEyVjVPbm8yVFd0M1RGTnBkRFIxVXpoMVUwZEVRamt4YlRaalltOWlZMlJNUkRScGJXNWxPRzVHYjJsUWFWVTBibnByY1NJc0ltbHpjM1ZoYm1ObFJHRjBaU0k2SWpJd01qSXRNVEF0TWpGVU1qRTZNRFE2TVRCYUlpd2laWGh3YVhKaGRHbHZia1JoZEdVaU9pSXlNRFV4TFRFd0xUQTFWREUwT2pRNE9qQXdMakF3TUZvaUxDSmpjbVZrWlc1MGFXRnNVM1ZpYW1WamRDSTZleUpoWkdScGRHbHZibUZzVG1GdFpTSTZJbWhoYm1zZ2FHbHNiQ0lzSW1KcGNuUm9SR0YwWlNJNklqSXdNRGt0TURFdE1ETWlMQ0ptWVcxcGJIbE9ZVzFsSWpvaWMybHRjSE52YmlJc0ltZHBkbVZ1VG1GdFpTSTZJbkpwWTJ0NUlHSnZZbUo1SWl3aWFXUWlPaUprYVdRNmEyVjVPbm8yVFd0M1RGTnBkRFIxVXpoMVUwZEVRamt4YlRaalltOWlZMlJNUkRScGJXNWxPRzVHYjJsUWFWVTBibnByY1NJc0luQnZjM1JoYkVGa1pISmxjM01pT25zaVlXUmtjbVZ6YzBOdmRXNTBjbmtpT2lKVkxsTXVRU0lzSW1Ga1pISmxjM05NYjJOaGJHbDBlU0k2SWtGMWMzUnBiaUlzSW1Ga1pISmxjM05TWldkcGIyNGlPaUpVV0NJc0luQnZjM1JoYkVOdlpHVWlPaUkzT0RjeU5DSXNJbk4wY21WbGRFRmtaSEpsYzNNaU9pSXhNak1nU21GdWEzUnZjR2xoSUVGMlpTNGlmU3dpZEdGNFNVUWlPaUl4TWpNaWZTd2lZM0psWkdWdWRHbGhiRk5qYUdWdFlTSTZleUpwWkNJNklqbGpOekl6TURBd0xUY3dPRGt0TkRoallTMDROR1EwTFRJeVlXWmpaalF3T1dGaU1DSXNJblI1Y0dVaU9pSktjMjl1VTJOb1pXMWhWbUZzYVdSaGRHOXlNakF4T0NKOWZYMC5ScksyQjhEX2hKeF8taEJkYnZNSERFeXlqZ2NOZ2Mtb1kwODFsb21zS0Z6VmFzNm14YVdXMENVWHIzWGdnWEo4SjdQejJFT2plSlVIOUcyT3BFN2RBQSJdfQ.Au7ghMMN8FL2TR3tqoaHhP4pFF8MLS5sgdyG387XNaDWmduqq6xLjE4BJptfnboFAfg_-sb02N2sAmy5P_SeDg'
-  // };
-
+  // TODO: Dynamically Create VC
   const credAppReq = {
     alg: "EdDSA",
     credential_application: {
@@ -67,9 +75,9 @@ const submitApplication = async () => {
         },
       },
       id: "id123",
-      manifest_id: "0ee5788b-40b8-4f63-a826-4ba07c347e43",
+      manifest_id: getManifestsDecodedDataJson.manifests[0].credential_manifest.id,
       presentation_submission: {
-        definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
+        definition_id: getManifestsDecodedDataJson.manifests[0].credential_manifest.presentation_definition.id,
         descriptor_map: [
           {
             format: "jwt_vc",
@@ -84,10 +92,12 @@ const submitApplication = async () => {
     },
     kid: did,
     verifiableCredentials: [
-      "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa29IakhaU01ORkFqODFHRjI0OTh3b0s2SEV0RzVteGNIeHdXbkVkNE41Nmh2IiwidHlwIjoiSldUIn0.eyJleHAiOjI1ODAxMzAwODAsImlzcyI6ImRpZDprZXk6ejZNa29IakhaU01ORkFqODFHRjI0OTh3b0s2SEV0RzVteGNIeHdXbkVkNE41Nmh2IiwianRpIjoiODFhYzY1YzMtMmYxNi00NDkxLTgyMjktNDEzMmI0NTdlZGY3IiwibmJmIjoxNjY2NjQ0MjU1LCJzdWIiOiJkaWQ6a2V5Ono2TWtvSGpIWlNNTkZBajgxR0YyNDk4d29LNkhFdEc1bXhjSHh3V25FZDRONTZodiIsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sImlkIjoiODFhYzY1YzMtMmYxNi00NDkxLTgyMjktNDEzMmI0NTdlZGY3IiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6a2V5Ono2TWtvSGpIWlNNTkZBajgxR0YyNDk4d29LNkhFdEc1bXhjSHh3V25FZDRONTZodiIsImlzc3VhbmNlRGF0ZSI6IjIwMjItMTAtMjRUMjA6NDQ6MTVaIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDUxLTEwLTA1VDE0OjQ4OjAwLjAwMFoiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJhZGRpdGlvbmFsTmFtZSI6ImhhbmsgaGlsbCIsImJpcnRoRGF0ZSI6IjIwMDktMDEtMDMiLCJmYW1pbHlOYW1lIjoic2ltcHNvbiIsImdpdmVuTmFtZSI6InJpY2t5IGJvYmJ5IiwiaWQiOiJkaWQ6a2V5Ono2TWtvSGpIWlNNTkZBajgxR0YyNDk4d29LNkhFdEc1bXhjSHh3V25FZDRONTZodiIsInBvc3RhbEFkZHJlc3MiOnsiYWRkcmVzc0NvdW50cnkiOiJVLlMuQSIsImFkZHJlc3NMb2NhbGl0eSI6IkF1c3RpbiIsImFkZHJlc3NSZWdpb24iOiJUWCIsInBvc3RhbENvZGUiOiI3ODcyNCIsInN0cmVldEFkZHJlc3MiOiIxMjMgSmFua3RvcGlhIEF2ZS4ifSwidGF4SUQiOiIxMjMifSwiY3JlZGVudGlhbFNjaGVtYSI6eyJpZCI6IjEzODhhMjNmLTBmMTUtNDc0YS05ZWFjLTBiZmNmNWNlMzE3ZCIsInR5cGUiOiJKc29uU2NoZW1hVmFsaWRhdG9yMjAxOCJ9fX0.r5tIdj48tKXW60Y0E1YuCJqEC5um7DZUMCOxUblOV-v9GEeCUTRPoGU_6NQSz-mW7jW_ChZp4XM7dy97jXJWAw",
+      "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa3Z4UHh1eXFUVnI0YVZLck00cTY1ekJZYUFrNHJ3SzZrd1JUUDRLbVptVEVtIiwidHlwIjoiSldUIn0.eyJleHAiOjI1ODAxMzAwODAsImlzcyI6ImRpZDprZXk6ejZNa3Z4UHh1eXFUVnI0YVZLck00cTY1ekJZYUFrNHJ3SzZrd1JUUDRLbVptVEVtIiwianRpIjoiNTIyYTY3NzQtNWZmNi00MDcyLTk3NjItMmIzOGM0NDE2Y2U0IiwibmJmIjoxNjY2NzIwNzUyLCJzdWIiOiJkaWQ6a2V5Ono2TWt2eFB4dXlxVFZyNGFWS3JNNHE2NXpCWWFBazRyd0s2a3dSVFA0S21abVRFbSIsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sImlkIjoiNTIyYTY3NzQtNWZmNi00MDcyLTk3NjItMmIzOGM0NDE2Y2U0IiwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6a2V5Ono2TWt2eFB4dXlxVFZyNGFWS3JNNHE2NXpCWWFBazRyd0s2a3dSVFA0S21abVRFbSIsImlzc3VhbmNlRGF0ZSI6IjIwMjItMTAtMjVUMTc6NTk6MTJaIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDUxLTEwLTA1VDE0OjQ4OjAwLjAwMFoiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJhZGRpdGlvbmFsTmFtZSI6ImhhbmsgaGlsbCIsImJpcnRoRGF0ZSI6IjIwMDktMDEtMDMiLCJmYW1pbHlOYW1lIjoic2ltcHNvbiIsImdpdmVuTmFtZSI6InJpY2t5IGJvYmJ5IiwiaWQiOiJkaWQ6a2V5Ono2TWt2eFB4dXlxVFZyNGFWS3JNNHE2NXpCWWFBazRyd0s2a3dSVFA0S21abVRFbSIsInBvc3RhbEFkZHJlc3MiOnsiYWRkcmVzc0NvdW50cnkiOiJVLlMuQSIsImFkZHJlc3NMb2NhbGl0eSI6IkF1c3RpbiIsImFkZHJlc3NSZWdpb24iOiJUWCIsInBvc3RhbENvZGUiOiI3ODcyNCIsInN0cmVldEFkZHJlc3MiOiIxMjMgSmFua3RvcGlhIEF2ZS4ifSwidGF4SUQiOiIxMjMifSwiY3JlZGVudGlhbFNjaGVtYSI6eyJpZCI6Ijg3MzZkMTBjLTg5Y2MtNDg5ZS1iYzJjLTQzZDBmZmY1YjYzMCIsInR5cGUiOiJKc29uU2NoZW1hVmFsaWRhdG9yMjAxOCJ9fX0.pnDBPMtg05AjugX7QagvGBZepkaIseDSiOLKrHmOe6B7IhRpZ_RQxjRwLlHmqBd1dsmRJkGq6gYtSr12W8woBQ",
     ],
   };
 
+  console.log("\n HERE 2\n")
+  console.log(credAppReq)
   const ecPublicKey = await jose.importJWK(privateJWK, "EdDSA");
 
   const jwt = await new jose.SignJWT(credAppReq)
@@ -128,8 +138,12 @@ const submitApplication = async () => {
   let resp;
   try {
     resp = await axios.post("http://localhost:9000", dwnRequest);
-    console.log("\nDWN Message Response:");
+    console.log("\nCollections Write DWN Message Response:\n");
     console.log(resp.status, JSON.stringify(resp.data, null, 2));
+
+    console.log("\nCollections Write Decoded Data:\n");
+    console.log(atob(resp.data.replies[0].entries[0].encodedData))
+
   } catch (e) {
     console.log(e);
   }
@@ -180,7 +194,7 @@ const isValidSubmitApplicationResponse = (submitApplicationResp) => {
 }
 
 const getManifestsResp = await getManifests();
-const submitApplicationResp = await submitApplication();
+const submitApplicationResp = await submitApplication(getManifestsResp);
 
 
 if (!isValidGetManifestResponse(getManifestsResp)) {
