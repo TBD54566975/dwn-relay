@@ -11,3 +11,5 @@ RUN apk add --update python3 make g++
 RUN npm install --build-from-source
 
 CMD node --es-module-specifier-resolution=node src
+
+EXPOSE 9000
