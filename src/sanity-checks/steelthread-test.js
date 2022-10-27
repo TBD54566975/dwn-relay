@@ -24,7 +24,7 @@ const getManifests = async () => {
   });
 
   const dwnRequest = {
-    messages: [collectionsQueryMessage.toObject()],
+    messages: [collectionsQueryMessage.message],
   };
 
   console.log('Sending Request to DWN:');
@@ -80,7 +80,6 @@ const submitApplication = async (getManifestsResp) => {
   const credAppJson = JSON.stringify(credApp);
   const credAppBytes = new TextEncoder().encode(credAppJson);
   const credAppDwnMessage = await CollectionsWrite.create({
-    contextId   : uuidv4(),
     data        : credAppBytes,
     dateCreated : Date.now(),
     dataFormat  : 'application/json',
@@ -94,7 +93,7 @@ const submitApplication = async (getManifestsResp) => {
   });
 
   const dwnRequest = {
-    messages: [credAppDwnMessage.toObject()],
+    messages: [credAppDwnMessage.message],
   };
 
   console.log('Sending Request to DWN:');

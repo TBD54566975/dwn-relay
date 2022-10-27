@@ -132,8 +132,10 @@ export default async function dwnHandler(req, res) {
 
     if (originatingMessageDescriptor.protocol) {
       collectionsWriteInput.protocol = originatingMessageDescriptor.protocol;
-      collectionsWriteInput.contextId = originatingMessageDescriptor.contextId;
       collectionsWriteInput.parentId = originatingMessageDescriptor.recordId;
+
+      const originatingCollectionsCreate = new CollectionsWrite(dwnMessage);
+      collectionsWriteInput.contextId = originatingMessageDescriptor.contextId ?? await originatingCollectionsCreate.getCanonicalId();
     }
 
     if (downstreamResp.data) {
@@ -144,7 +146,7 @@ export default async function dwnHandler(req, res) {
     const dwmifiedResponse = await CollectionsWrite.create(collectionsWriteInput);
     
     // TODO: handle errors
-    await dwn.processMessage(dwmifiedResponse.toObject());
+    await dwn.processMessage(dwmifiedResponse.message);
 
     const theOtherThang = { ...collectionsWriteInput };
     theOtherThang.target = collectionsWriteInput.recipient;
@@ -153,7 +155,7 @@ export default async function dwnHandler(req, res) {
 
     resp.replies[0] = {
       status  : { code: downstreamResp.status },
-      entries : [chuckchuckbang.toObject()]
+      entries : [chuckchuckbang.message]
     };
 
     return res.status(200).json(resp);

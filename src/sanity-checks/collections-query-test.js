@@ -21,7 +21,7 @@ const collectionsQueryMessage = await CollectionsQuery.create({
 
 
 const dwnRequest = {
-  messages: [collectionsQueryMessage.toObject()]
+  messages: [collectionsQueryMessage.message]
 };
 
 try {
