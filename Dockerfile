@@ -13,4 +13,3 @@ RUN npm install --build-from-source
 EXPOSE 9000
 
 CMD node --es-module-specifier-resolution=node src
-

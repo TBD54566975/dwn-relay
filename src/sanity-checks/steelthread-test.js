@@ -27,7 +27,7 @@ const getManifests = async () => {
     messages: [collectionsQueryMessage.message],
   };
 
-  console.log('Sending Request to DWN:');
+  console.log('\nSending Get Manifests Request to DWN:');
   console.log(JSON.stringify(dwnRequest));
 
   let resp;
@@ -96,7 +96,7 @@ const submitApplication = async (getManifestsResp) => {
     messages: [credAppDwnMessage.message],
   };
 
-  console.log('Sending Request to DWN:');
+  console.log('\nSending Collections Write Request to DWN:');
   console.log(JSON.stringify(dwnRequest));
 
   let resp;
