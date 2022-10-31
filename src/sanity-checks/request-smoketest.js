@@ -25,7 +25,7 @@ const collectionsWriteMessage = await CollectionsWrite.create({
 
 
 const dwnRequest = {
-  messages: [collectionsWriteMessage.toObject()]
+  messages: [collectionsWriteMessage.message]
 };
 
 try {
