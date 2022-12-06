@@ -1,0 +1,37 @@
+name: Continuous Integration Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # used to run action manually via the UI
+  workflow_dispatch:
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18.8.0
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.8.0
+      - run: npm audit
+
+  build:
+    runs-on: ubuntu-latest
+    # read more about matrix strategies here: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
+    strategy:
+      matrix:
+        node-version: [16.17.0, 18.8.0]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      # https://docs.npmjs.com/cli/v8/commands/npm-ci
+      - run: npm clean-install
+      # check the licences allow list to avoid incorrectly licensed dependencies creeping in: 
+      - run: npm run license-check

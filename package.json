@@ -16,9 +16,11 @@
   },
   "devDependencies": {
     "eslint": "8.24.0",
-    "eslint-plugin-import": "2.26.0"
+    "eslint-plugin-import": "2.26.0",
+    "license-report" : "6.3.0"
   },
   "scripts": {
-    "start": "node --es-module-specifier-resolution=node src"
+    "start": "node --es-module-specifier-resolution=node src",
+    "license-check": "license-report --only=prod > license-report.json && node ./build/license-check.cjs"
   }
 }
