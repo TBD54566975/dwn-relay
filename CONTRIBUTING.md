@@ -1,6 +1,4 @@
 # Contributing Guide <!-- omit in toc -->
-TODO: Add Intro here
-
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
